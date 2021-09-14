@@ -97,7 +97,7 @@ public class MinByAgeGenericUDAF extends AbstractGenericUDAFResolver {
 
         /** class for storing the current max value */
         @AggregationType(estimable = false)
-        static class MinAgg extends AbstractAggregationBuffer {
+        static class MinAggregation extends AbstractAggregationBuffer {
             Object x, y;
 
             @Override
@@ -120,23 +120,25 @@ public class MinByAgeGenericUDAF extends AbstractGenericUDAFResolver {
         }
 
 
-
+        // 创建新的聚合计算需要的内存以用来计算
         @Override
         public AggregationBuffer getNewAggregationBuffer() throws HiveException {
-            return new MinAgg();
+            return new MinAggregation();
         }
 
+        // 内存重用
         @Override
         public void reset(AggregationBuffer aggregationBuffer) throws HiveException {
-            MinAgg myagg = (MinAgg) aggregationBuffer;
+            MinAggregation myagg = (MinAggregation) aggregationBuffer;
             myagg.x = null;
             myagg.y = null;
         }
 
+        // map阶段调用
         @Override
         public void iterate(AggregationBuffer aggregationBuffer, Object[] parameters) throws HiveException {
             assert (parameters.length == 2);
-            MinAgg myagg = (MinAgg) aggregationBuffer;
+            MinAggregation myagg = (MinAggregation) aggregationBuffer;
             Object x = parameters[0];
             Object y = parameters[1];
 
@@ -144,22 +146,24 @@ public class MinByAgeGenericUDAF extends AbstractGenericUDAFResolver {
 
         }
 
+        // mapper、combiner结束要返回的结果
         @Override
         public Object terminatePartial(AggregationBuffer aggregationBuffer) throws HiveException {
-            MinAgg myagg = (MinAgg) aggregationBuffer;
+            MinAggregation myagg = (MinAggregation) aggregationBuffer;
             Object[] partial = new Object[2];
             partial[0] = myagg.x;
             partial[1] = myagg.y;
             return partial;
         }
 
+        // combiner合并map返回的结果，或reducer合并mapper或combiner返回的结果
         @Override
         public void merge(AggregationBuffer aggregationBuffer, Object partial) throws HiveException {
             if (partial == null) {
                 return;
             }
 
-            MinAgg myagg = (MinAgg) aggregationBuffer;
+            MinAggregation myagg = (MinAggregation) aggregationBuffer;
             Object x = partialInputOI.getStructFieldData(partial, xField);
             Object y = partialInputOI.getStructFieldData(partial, yField);
 
@@ -167,9 +171,10 @@ public class MinByAgeGenericUDAF extends AbstractGenericUDAFResolver {
 
         }
 
+        // reducer返回的结果，或者没有reduce时mapper端返回的结果
         @Override
         public Object terminate(AggregationBuffer aggregationBuffer) throws HiveException {
-            MinAgg myagg = (MinAgg) aggregationBuffer;
+            MinAggregation myagg = (MinAggregation) aggregationBuffer;
             return myagg.x;
         }
     }

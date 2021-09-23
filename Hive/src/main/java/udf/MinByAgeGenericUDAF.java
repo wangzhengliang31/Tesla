@@ -22,7 +22,7 @@ import java.util.List;
 
 /**
  * @author wzl
- * @desc UDAF AbstractGenericUDAFResolver 检查参数，GenericUDAFEvaluator 具体实现
+ * @desc UDAF AbstractGenericUDAFResolver 检查参数，操作符重载，GenericUDAFEvaluator 具体实现
  * @date 2021/9/9 4:48 下午
  **/
 @Description(name = "min_by_age", value = "_FUNC(name, age) - Return the youngest user name")

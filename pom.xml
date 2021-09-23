@@ -11,6 +11,7 @@
     <modules>
         <module>Flink</module>
         <module>Hive</module>
+        <module>HBase</module>
     </modules>
 
     <properties>

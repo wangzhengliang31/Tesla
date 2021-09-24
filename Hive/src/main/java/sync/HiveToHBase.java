@@ -99,15 +99,18 @@ public class HiveToHBase {
             StringBuffer buf = new StringBuffer("");
             for (int offset = 0; offset < b.length; offset++) {
                 i = b[offset];
-                if (i < 0)
+                if (i < 0) {
                     i += 256;
-                if (i < 16)
+                }
+                if (i < 16) {
                     buf.append("0");
+                }
                 buf.append(Integer.toHexString(i));
             }
             return buf.toString().substring(8, 24);
         }
 
+        @Override
         public void map(LongWritable inKey, Text inValue, Context context) throws ClassCastException {
             // ###
             String[] infos = inValue.toString().split(SPLIT_SYMBOL);
@@ -167,6 +170,7 @@ public class HiveToHBase {
         UserGroupInformation ugi = UserGroupInformation.createRemoteUser(EXEC_USER);
         try {
             ugi.doAs(new PrivilegedExceptionAction<String>() {
+                @Override
                 public String run() throws Exception {
                     Configuration conf2 = new Configuration();
                     conf2.set("hbase.zookeeper.quorum", ZK);
